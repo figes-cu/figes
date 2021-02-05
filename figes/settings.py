@@ -28,6 +28,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1',
                  'figes-294014.uk.r.appspot.com',
                  'figes-294014.appspot.com',
+                 'figes.pythonanywhere.com'
                 ]
 
 #Enable file Session Engine 
