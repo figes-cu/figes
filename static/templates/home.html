@@ -1,0 +1,117 @@
+{% extends "index.html" %}
+{% load static %}
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">{{frame_title}}</h1>
+</div>
+<div class="col-md-8 order-md-1">
+<h3 class="mb-3">{{cards_title}}</h3>
+<form enctype="multipart/form-data" action="" method="post">
+  {% csrf_token %}
+<div class="accordion" id="figesConfig">
+  {% for card in cards %}
+  <div class="card">
+    <div class="card-header" id="{{card.id}}">
+      <h5 class="mb-0">
+        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{card.idb}}" aria-expanded="true" aria-controls="{{card.idb}}">
+          {{card.description}}
+        </button>
+      </h5>
+    </div>
+    <div id={{card.idb}} class="{{card.collapse}}" aria-labelledby="{{card.id}}" data-parent="#figesConfig">
+      <div class="card-body">
+        {% if card.field_input %}
+          {% for field_dict in card.field_list %}
+            <div class="row">
+              {% for namex, dictx in field_dict.items %}
+                <div class="col-md-3 mb-3">
+                  <label for="{{namex}}">{{dictx.label}}</label>
+                  {% if dictx.isInput %}
+                    <input type="{{dictx.type}}" class="form-control" id="{{namex}}" name="{{namex}}" placeholder="{{dictx.placeholder}}" value="{{dictx.value}}">
+                  {% else %}
+                    {% if dictx.tag == 'select' %}
+                      <select class="{{dictx.class}}" id="{{namex}}" name="{{namex}}" value="{{dictx.value}}" required="">
+                        {% for choicex, selectedx in dictx.choices.items %}
+                          <option value="{{choicex}}" {{selectedx}}>{{choicex}}</option>
+                        {% endfor %}
+                      </select>
+                    {% else %}
+                      <input type="{{dictx.type}}" class="form-control" id="{{namex}}" name="{{namex}}" placeholder="{{dictx.placeholder}}" value="{{dictx.value}}" {{dictx.extras}} required>
+                    {% endif %}
+                  {% endif %}
+                  <div class="invalid-feedback">
+                    {{dictx.help}}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>  
+          {% endfor %}
+        {% endif %}
+        {% if card.file_input %}
+          <div class= "inner-accordion">
+            <div class= "accordion" id="lmpdesign">
+              <div class="card-one">
+                <div class="card-header" id="headingOne">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link" type= "button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Custom hourly curve. Upload a csv file below for custom number of periods.
+                  </button>
+                  </h5>
+                </div>
+                
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#lmpdesign">
+                  <div class="card-body">
+                    
+                    {{bk_script2|safe}}
+                    {{bk_div2|safe }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          Please upload a single column CSV file for the price data in $/MWh without a text header and indicate the time step in your file.
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label for="userlmpFile">No header CSV file</label>
+              <input type="file" class="form-control-file" name="userlmpFile">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="tSize">Time step in minutes</label>
+              <input type="text" class="form-control" name="tSize" id="tSize" placeholder="" value="{{tsize_value}}" required>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="lmp_example">See our example price file</label>
+              <a class="btn btn-secondary" href="{% static 'lmp_example_15min.csv' %}" download="lmp_example_15min.csv" role="button">Download csv example (15min)</a>
+            </div>
+          </div>  
+          
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<input type="hidden" name="newlmps" id="newlmps" value=""> 
+  <hr class="mb-4">
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <button type="submit" class="btn btn-primary">{{btn_label.opt}}</button>
+    </div>
+    <input type="text" class="form-control" value="{{revenue}}" aria-label="" aria-describedby="basic-addon1" readonly>
+  </div>
+</form>
+
+</div>
+
+{% if show_results %}
+  {{bk_script|safe}}
+  {{bk_div|safe }}
+  {{bk_r_script|safe}}
+  {{bk_r_div|safe }}  
+  <div class="input-group mb-3">
+    <a class="btn btn-secondary" href="/download" download={{dwn_filename}} role="button">{{btn_label.dwn}}</a>
+  </div>
+{% endif %}
+
+{% endblock %}
